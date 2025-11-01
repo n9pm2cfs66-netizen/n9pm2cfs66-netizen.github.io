@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>陽明山媽媽版二選一景點選擇器</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #e6f7ff; }
+  h1 { color: #3399ff; }
+  button { padding: 15px 30px; font-size: 18px; background: #66ccff; border: none; border-radius: 8px; cursor: pointer; }
+  button:hover { background: #3399ff; color: #fff; }
+  .result { margin-top: 30px; font-size: 20px; color: #333; }
+</style>
+</head>
+<body>
+
+<h1>🌄 陽明山媽媽版二選一景點選擇器</h1>
+<p>按下「抽！」隨機生成今天帶媽媽出遊的二選一景點</p>
+<button onclick="draw()">抽！</button>
+
+<div class="result" id="result"></div>
+
+<script>
+const locations = [
+  "陽明山花卉中心",
+  "竹子湖海芋田",
+  "竹子湖繡球花季",
+  "擎天崗草原",
+  "小油坑地熱景觀",
+  "草山行館",
+  "平菁街42巷",
+  "陽明山溫泉區",
+  "陽明山國際賞鳥區",
+  "七星山登山步道（可走短程）",
+  "冷水坑自然步道",
+  "夢幻湖",
+  "陽明山冷水坑遊客中心",
+  "大屯山自然保護區",
+  "陽明書屋",
+  "陽明山竹子湖咖啡廳",
+  "陽明山小油坑觀景台",
+  "陽明山七星公園",
+  "擎天崗觀景平台",
+  "陽明山竹子湖小路",
+  "陽明山金山亭步道",
+  "陽明山四季花園",
+  "陽明山溫泉飯店休閒區",
+  "陽明山草山夜景觀景台",
+  "陽明山菁山吊橋",
+  "陽明山文化大學賞景區",
+  "陽明山七星山步道入口（短程）",
+  "陽明山大屯自然步道",
+  "陽明山竹子湖荷花池",
+  "陽明山花鐘",
+  "陽明山竹子湖餐廳休息區",
+  "陽明山石梯嶺步道",
+  "陽明山陽明公園",
+  "陽明山陽明小徑",
+  "陽明山草山歷史步道",
+  "陽明山平菁路咖啡廳",
+  "陽明山百花園",
+  "陽明山自然教育中心",
+  "陽明山觀景涼亭",
+  "陽明山翠峰湖小徑",
+  "陽明山陽明池",
+  "陽明山仰德大道賞景點",
+  "陽明山風櫃口步道",
+  "陽明山高峰步道短程",
+  "陽明山竹子湖步行街",
+  "陽明山美軍俱樂部遺址",
+  "陽明山石牌自然步道",
+  "陽明山夢幻咖啡廳",
+  "陽明山竹子湖風景區",
+  "陽明山四季咖啡小屋"
+];
+
+function draw() {
+  let firstIndex = Math.floor(Math.random() * locations.length);
+  let secondIndex;
+  do {
+    secondIndex = Math.floor(Math.random() * locations.length);
+  } while(secondIndex === firstIndex);
+
+  const first = locations[firstIndex];
+  const second = locations[secondIndex];
+
+  document.getElementById("result").innerHTML =
+    `🎲 今日陽明山出遊二選一：<br>👉 ${first} <br>or <br>👉 ${second}`;
+}
+</script>
+
+</body>
+</html>
