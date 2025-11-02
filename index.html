@@ -1,93 +1,374 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>陽明山媽媽版二選一景點選擇器</title>
-<style>
-  body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #e6f7ff; }
-  h1 { color: #3399ff; }
-  button { padding: 15px 30px; font-size: 18px; background: #66ccff; border: none; border-radius: 8px; cursor: pointer; }
-  button:hover { background: #3399ff; color: #fff; }
-  .result { margin-top: 30px; font-size: 20px; color: #333; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 南崁一小時熱門景點抽籤輪盤 (右圖風格優化版) ✨</title>
+    <style>
+        /* 🎨 全局樣式與設計 */
+        body {
+            font-family: '微軟正黑體', 'Microsoft JhengHei', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); /* 舒適清新的藍色漸變背景 */
+            color: #3f51b5; /* 深藍色文字 */
+            padding: 20px;
+        }
+
+        h1 {
+            color: #1a237e; /* 更深的藍色標題 */
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            letter-spacing: 1.5px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            padding-bottom: 10px;
+            border-bottom: 3px solid #64b5f6;
+            text-align: center;
+        }
+
+        /* 輪盤容器 */
+        .wheel-container {
+            position: relative;
+            width: 420px; /* 調整尺寸讓它看起來更像範例 */
+            height: 420px;
+            margin: 30px auto;
+        }
+
+        /* 轉盤本體 */
+        #wheel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden; /* 確保扇形裁剪正確 */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), inset 0 0 8px rgba(255, 255, 255, 0.6);
+            transition: transform 6s cubic-bezier(0.25, 0.1, 0.25, 1); /* 更流暢的加速-減速曲線 */
+            border: 8px solid #ffffff; /* 白色邊框 */
+            box-sizing: border-box;
+            background-color: #f8f8f8; /* 背景色以防萬一 */
+        }
+
+        /* 輪盤指針 */
+        .pointer {
+            position: absolute;
+            top: -25px; /* 位於轉盤上方 */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-top: 35px solid #ef5350; /* 鮮紅色指針 */
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        /* 轉盤中央覆蓋層 (取代原始中間的文字，更貼近右圖) */
+        .wheel-center-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7); /* 深色背景 */
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 40px;
+            z-index: 15; /* 確保在扇形之上 */
+            font-size: 1.1em;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            white-space: nowrap; /* 防止文字換行 */
+        }
+
+        /* 扇形基礎樣式 */
+        .wheel-slice {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%; /* 旋轉中心在右下角 */
+            overflow: hidden;
+            box-sizing: border-box;
+            border-right: 1px solid rgba(255, 255, 255, 0.4); /* 分隔線 */
+            border-top: 1px solid rgba(255, 255, 255, 0.4); /* 分隔線 */
+        }
+
+        /* 扇形內容 (文字) */
+        .slice-content {
+            position: absolute;
+            width: 200%; /* 寬度足夠覆蓋整個扇區 */
+            height: 200%; /* 高度足夠覆蓋整個扇區 */
+            transform: 
+                rotate(var(--text-rotation)) 
+                translate(15%, 25%) 
+                scale(0.8); /* 調整位置和縮放 */
+            transform-origin: 0% 0%; /* 文字旋轉的基準點 */
+            font-size: 0.9em; /* 適當大小 */
+            font-weight: 600;
+            color: #fff; /* 白色文字 */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* 陰影讓文字更突出 */
+            text-align: left; /* 文字靠左 */
+            padding-left: 10px; /* 內部間距 */
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 顏色主題 - 採用鮮明且互相搭配的色彩，避免飽和度過高或過低 */
+        .color-0 { background-color: #66bb6a; } /* 淺綠 */
+        .color-1 { background-color: #42a5f5; } /* 亮藍 */
+        .color-2 { background-color: #ffa726; } /* 橘黃 */
+        .color-3 { background-color: #ec407a; } /* 亮粉紅 */
+        .color-4 { background-color: #9ccc65; } /* 淺草綠 */
+        .color-5 { background-color: #26c6da; } /* 天藍 */
+        .color-6 { background-color: #ab47bc; } /* 淺紫 */
+        .color-7 { background-color: #78909c; } /* 灰藍 */
+        /* 如果有更多選項，會循環使用這些顏色 */
+
+        /* 按鈕區塊 */
+        .controls {
+            display: flex;
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            padding: 15px 35px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            border-radius: 35px; /* 更圓潤 */
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #spinButton {
+            background-color: #4caf50; /* 綠色 */
+            color: white;
+        }
+
+        #spinButton:hover:not(:disabled) {
+            background-color: #388e3c;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        #spinButton:disabled {
+            background-color: #b0bec5;
+            cursor: not-allowed;
+            opacity: 0.7;
+            box-shadow: none;
+        }
+
+        #resetButton {
+            background-color: #f44336; /* 紅色 */
+            color: white;
+        }
+
+        #resetButton:hover {
+            background-color: #d32f2f;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 結果顯示 */
+        #result {
+            margin-top: 50px;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #d32f2f; 
+            text-align: center;
+            min-height: 60px; 
+            padding: 15px 30px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            border: 3px solid #64b5f6; /* 與標題線顏色呼應 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 480px;
+        }
+    </style>
 </head>
 <body>
 
-<h1>🌄 陽明山媽媽版二選一景點選擇器</h1>
-<p>按下「抽！」隨機生成今天帶媽媽出遊的二選一景點</p>
-<button onclick="draw()">抽！</button>
+    <h1>✨ 南崁一小時熱門景點抽籤輪盤 ✨</h1>
 
-<div class="result" id="result"></div>
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        
+        <div id="wheel">
+            </div>
+        
+        <div class="wheel-center-overlay">
+            按一下以旋轉
+        </div>
+    </div>
 
-<script>
-const locations = [
-  "陽明山花卉中心",
-  "竹子湖海芋田",
-  "竹子湖繡球花季",
-  "擎天崗草原",
-  "小油坑地熱景觀",
-  "草山行館",
-  "平菁街42巷",
-  "陽明山溫泉區",
-  "陽明山國際賞鳥區",
-  "七星山登山步道（可走短程）",
-  "冷水坑自然步道",
-  "夢幻湖",
-  "陽明山冷水坑遊客中心",
-  "大屯山自然保護區",
-  "陽明書屋",
-  "陽明山竹子湖咖啡廳",
-  "陽明山小油坑觀景台",
-  "陽明山七星公園",
-  "擎天崗觀景平台",
-  "陽明山竹子湖小路",
-  "陽明山金山亭步道",
-  "陽明山四季花園",
-  "陽明山溫泉飯店休閒區",
-  "陽明山草山夜景觀景台",
-  "陽明山菁山吊橋",
-  "陽明山文化大學賞景區",
-  "陽明山七星山步道入口（短程）",
-  "陽明山大屯自然步道",
-  "陽明山竹子湖荷花池",
-  "陽明山花鐘",
-  "陽明山竹子湖餐廳休息區",
-  "陽明山石梯嶺步道",
-  "陽明山陽明公園",
-  "陽明山陽明小徑",
-  "陽明山草山歷史步道",
-  "陽明山平菁路咖啡廳",
-  "陽明山百花園",
-  "陽明山自然教育中心",
-  "陽明山觀景涼亭",
-  "陽明山翠峰湖小徑",
-  "陽明山陽明池",
-  "陽明山仰德大道賞景點",
-  "陽明山風櫃口步道",
-  "陽明山高峰步道短程",
-  "陽明山竹子湖步行街",
-  "陽明山美軍俱樂部遺址",
-  "陽明山石牌自然步道",
-  "陽明山夢幻咖啡廳",
-  "陽明山竹子湖風景區",
-  "陽明山四季咖啡小屋"
-];
+    <div class="controls">
+        <button id="spinButton" class="btn">開始抽籤</button>
+        <button id="resetButton" class="btn">重設</button>
+    </div>
 
-function draw() {
-  let firstIndex = Math.floor(Math.random() * locations.length);
-  let secondIndex;
-  do {
-    secondIndex = Math.floor(Math.random() * locations.length);
-  } while(secondIndex === firstIndex);
+    <div id="result">點擊「開始抽籤」，決定您的旅程！</div>
 
-  const first = locations[firstIndex];
-  const second = locations[secondIndex];
+    <audio id="spinSound" src="./spin.mp3" preload="auto" loop></audio>
+    <audio id="winSound" src="./win.mp3" preload="auto"></audio>
 
-  document.getElementById("result").innerHTML =
-    `🎲 今日陽明山出遊二選一：<br>👉 ${first} <br>or <br>👉 ${second}`;
-}
-</script>
+    <script>
+    // --- 景點資料 (8 個選項) ---
+    const prizes = [
+        "大溪老街", 
+        "Xpark水族館", 
+        "小人國樂園", 
+        "竹圍漁港", 
+        "東眼山森林",
+        "拉拉山",
+        "富田香草農場",
+        "華泰名品城"
+    ];
 
+    const wheel = document.getElementById('wheel');
+    const spinButton = document.getElementById('spinButton');
+    const resultDiv = document.getElementById('result');
+    const spinSound = document.getElementById('spinSound');
+    const winSound = document.getElementById('winSound');
+    
+    const numPrizes = prizes.length;
+    const anglePerPrize = 360 / numPrizes; // 每個扇形的角度
+
+    // 新增變數來追蹤累積的總旋轉度數
+    let currentTotalRotation = 0; 
+
+    /**
+     * 創建轉盤扇區 (保持不變)
+     */
+    function createWheelSlices() {
+        wheel.innerHTML = ''; 
+        prizes.forEach((prize, index) => {
+            const slice = document.createElement('div');
+            slice.classList.add('wheel-slice', `color-${index % 8}`); 
+            
+            slice.style.transform = `rotate(${index * anglePerPrize}deg)`;
+            
+            const content = document.createElement('div');
+            content.classList.add('slice-content');
+            
+            const textSpan = document.createElement('span');
+            textSpan.textContent = prize;
+            content.appendChild(textSpan);
+
+            const textRotation = (anglePerPrize / 2) + 90; 
+            content.style.setProperty('--text-rotation', `${textRotation}deg`);
+            
+            slice.appendChild(content);
+            wheel.appendChild(slice);
+        });
+    }
+
+    /**
+     * 旋轉轉盤的主邏輯
+     */
+    function spinWheel() {
+        spinButton.disabled = true;
+        resultDiv.textContent = '轉盤旋轉中...祝您好運！';
+
+        // 1. **關鍵修正步驟：在旋轉前先將過渡效果移除並重置角度。**
+        //    讓轉盤瞬間回到一個「相對起點」(例如 0度)，但實際上是從當前總角度減去所有整圈。
+        wheel.style.transition = 'none';
+        
+        // 確保轉盤視覺上維持在原位，但數據上被重置到 0-360 度範圍。
+        // currentTotalRotation % 360 會得到 0-359 的值。
+        // 我們將其設為新的起點，這樣下一次旋轉就是從這個位置開始增加。
+        currentTotalRotation %= 360; 
+        wheel.style.transform = `rotate(${currentTotalRotation}deg)`;
+
+        // 暫停一小段時間 (0ms) 讓瀏覽器完成樣式重置，再重新開始動畫
+        setTimeout(() => {
+            // 2. 重新啟用過渡動畫
+            wheel.style.transition = 'transform 6s cubic-bezier(0.25, 0.1, 0.25, 1)';
+
+
+            // 隨機選取獲獎索引 (0 到 numPrizes - 1)
+            const winnerIndex = Math.floor(Math.random() * numPrizes);
+            const winningPrize = prizes[winnerIndex];
+
+            // 3. 計算目標旋轉角度 (總是正向旋轉)
+            
+            const spins = 5; // 每次至少轉 5 圈
+            const baseRotation = 360 * spins; 
+            const targetAngleForPointer = (winnerIndex * anglePerPrize) + (anglePerPrize / 2);
+            
+            // 轉盤需要轉動的角度： (總圈數角度) + (將獲獎扇區轉到指針下方的角度)
+            const rotationNeeded = (360 - targetAngleForPointer);
+
+            // 最終的目標角度 = 當前累積的角度 + 至少的圈數 + (所需額外旋轉的角度)
+            const finalTargetRotation = currentTotalRotation + baseRotation + rotationNeeded;
+
+            // 加入一點點隨機偏移
+            const randomOffset = (Math.random() * (anglePerPrize - 5)) - (anglePerPrize / 2 - 2.5); 
+            const actualRotation = finalTargetRotation + randomOffset;
+            
+            // 4. 更新累積的角度
+            currentTotalRotation = actualRotation; 
+
+            // 5. 播放旋轉音效
+            spinSound.currentTime = 0; 
+            spinSound.play().catch(e => console.error("無法播放轉盤音效 (spin.mp3)。", e)); 
+
+            // 6. 執行旋轉
+            wheel.style.transform = `rotate(${actualRotation}deg)`;
+
+            // 7. 旋轉結束後的處理 (6秒後)
+            setTimeout(() => {
+                spinSound.pause();
+                
+                winSound.currentTime = 0;
+                winSound.play().catch(e => console.error("無法播放結束音效 (win.mp3)。", e)); 
+                
+                resultDiv.innerHTML = `🎉 恭喜！抽中了：<br><strong>${winningPrize}</strong>`;
+                spinButton.disabled = false;
+            }, 6000); 
+        }, 10); // 延遲 10ms，確保重置生效
+    }
+
+    /**
+     * 重設轉盤 (保持不變)
+     */
+    function resetWheel() {
+        spinSound.pause();
+        
+        wheel.style.transition = 'transform 0.5s ease-out'; 
+        wheel.style.transform = 'rotate(0deg)';
+        currentTotalRotation = 0; // 重設累積角度
+        
+        resultDiv.textContent = '點擊「開始抽籤」，決定您的旅程！';
+        spinButton.disabled = false;
+
+        setTimeout(() => {
+             wheel.style.transition = 'transform 6s cubic-bezier(0.25, 0.1, 0.25, 1)';
+        }, 500);
+    }
+
+    // --- 初始化和事件監聽 ---
+    document.addEventListener('DOMContentLoaded', () => {
+        createWheelSlices();
+        spinButton.addEventListener('click', spinWheel);
+        resetButton.addEventListener('click', resetWheel);
+        
+        spinSound.load();
+        winSound.load();
+    });
+
+    </script>
 </body>
 </html>
